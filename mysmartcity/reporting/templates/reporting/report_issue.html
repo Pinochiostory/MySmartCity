@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue — MySmartCity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0B1221;
+            --surface: #131D30;
+            --card: #1A2640;
+            --card-hover: #1F2E4A;
+            --border: #2A3B55;
+            --border-light: #3A4F6A;
+            --accent: #00C896;
+            --accent-dim: #00C89618;
+            --accent-glow: #00C89633;
+            --blue: #3B82F6;
+            --blue-dim: #3B82F618;
+            --text: #E8EDF5;
+            --muted: #7A8BA5;
+            --subtle: #2E4060;
+            --danger: #EF4444;
+            --danger-dim: #EF444418;
+            --warn: #F59E0B;
+            --r: 12px;
+            --r-sm: 8px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* ── TOP NAV ── */
+        .topnav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .brand {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--accent);
+            letter-spacing: -.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: brandpulse 2s infinite; }
+        @keyframes brandpulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            transition: .2s;
+            border: 1px solid transparent;
+        }
+        .nav-link:hover { color: var(--text); background: var(--card); }
+        .nav-link.active { color: var(--accent); background: var(--accent-dim); border-color: var(--accent-glow); }
+
+        /* ── PAGE LAYOUT ── */
+        .page-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 36px 24px;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+        .page-icon {
+            width: 50px; height: 50px;
+            border-radius: 13px;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-glow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.1;
+        }
+        .page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+        /* ── MESSAGES ── */
+        .messages { margin-bottom: 20px; }
+        .msg {
+            padding: 12px 16px;
+            border-radius: var(--r-sm);
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .msg.success { background: #00C89618; border: 1px solid #00C89633; color: #00C896; }
+        .msg.error   { background: var(--danger-dim); border: 1px solid #EF444433; color: #EF4444; }
+
+        /* ── FORM SECTIONS ── */
+        .form-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: border-color .2s;
+        }
+        .form-section:focus-within { border-color: var(--border-light); }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 14px;
+        }
+        .section-label::before {
+            content: '';
+            width: 4px; height: 16px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* ── ISSUE TYPE GRID ── */
+        .issue-types {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .issue-btn {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 14px 8px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            user-select: none;
+        }
+        .issue-btn:hover { border-color: var(--border-light); background: var(--card-hover); }
+        .issue-btn.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+            box-shadow: 0 0 0 3px #00C89610;
+        }
+        .issue-btn .ico { font-size: 26px; display: block; margin-bottom: 8px; }
+        .issue-btn .lbl { font-size: 11px; font-weight: 500; color: var(--muted); line-height: 1.3; }
+        .issue-btn.selected .lbl { color: var(--accent); }
+
+        /* ── UPLOAD ZONE ── */
+        .upload-zone {
+            background: var(--surface);
+            border: 1.5px dashed var(--border);
+            border-radius: var(--r-sm);
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
+        }
+        .upload-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+        .upload-zone.has-file { border-color: var(--accent); border-style: solid; background: var(--accent-dim); }
+        .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+        .uz-ico { font-size: 28px; display: block; margin-bottom: 8px; }
+        .uz-txt { font-size: 14px; color: var(--text); font-weight: 500; }
+        .uz-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        .uz-name { font-size: 13px; color: var(--accent); margin-top: 6px; font-weight: 500; }
+
+        /* ── VOICE NOTE ── */
+        .voice-row { display: flex; align-items: center; gap: 14px; }
+        .rec-btn {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all .2s;
+            flex-shrink: 0;
+        }
+        .rec-btn:hover { border-color: var(--danger); background: var(--danger-dim); }
+        .rec-btn.recording {
+            border-color: var(--danger);
+            background: var(--danger-dim);
+            animation: recpulse 1s infinite;
+        }
+        @keyframes recpulse { 0%,100%{box-shadow:0 0 0 0 #EF444444} 50%{box-shadow:0 0 0 10px #EF444400} }
+        .wave-bars { display: flex; align-items: center; gap: 3px; height: 30px; }
+        .bar { width: 3px; height: 4px; background: var(--border); border-radius: 2px; transition: height .1s; }
+        .bar.active { background: var(--accent); animation: wave .7s ease-in-out infinite; }
+        .bar:nth-child(2){animation-delay:.1s}.bar:nth-child(3){animation-delay:.2s}
+        .bar:nth-child(4){animation-delay:.3s}.bar:nth-child(5){animation-delay:.4s}
+        @keyframes wave { 0%,100%{height:4px} 50%{height:22px} }
+        .rec-info { flex: 1; }
+        .rec-label { font-size: 13px; color: var(--muted); margin-top: 5px; }
+        .rec-timer { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--danger); display: none; }
+
+        /* ── LOCATION ── */
+        .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .loc-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 11px 14px;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer;
+            transition: .2s;
+            font-size: 13px; font-weight: 500; color: var(--muted);
+        }
+        .loc-btn:hover { border-color: var(--blue); color: var(--text); }
+        .loc-btn.detecting { border-color: var(--accent); color: var(--accent); }
+        .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+        .loc-btn.detecting .loc-dot { background: var(--accent); animation: locpulse 1s infinite; }
+        @keyframes locpulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+        .loc-input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 11px 14px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: .2s;
+        }
+        .loc-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+        .loc-input::placeholder { color: var(--muted); }
+
+        /* ── TEXTAREA ── */
+        .desc-textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 12px 14px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: .2s;
+            min-height: 100px;
+        }
+        .desc-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+        .desc-textarea::placeholder { color: var(--muted); }
+
+        /* ── ERRORS ── */
+        .field-error { font-size: 12px; color: var(--danger); margin-top: 6px; }
+
+        /* ── SUBMIT BTN ── */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--r-sm);
+            color: #0B1221;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: .04em;
+            transition: all .2s;
+            margin-top: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .submit-btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 24px #00C89630; }
+        .submit-btn:active { transform: translateY(0); }
+
+        /* ── CHAR COUNT ── */
+        .char-row { display: flex; justify-content: flex-end; margin-top: 5px; }
+        .char-count { font-size: 11px; color: var(--muted); }
+        .char-count.warn { color: var(--warn); }
+
+        /* responsive */
+        @media (max-width: 480px) {
+            .issue-types { grid-template-columns: repeat(2, 1fr); }
+            .loc-grid { grid-template-columns: 1fr; }
+            .topnav { padding: 0 16px; }
+            .page-wrap { padding: 24px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <div class="brand">
+        <div class="brand-dot"></div>
+        MySmartCity
+    </div>
+    <div class="nav-links">
+        <a href="{% url 'report_issue' %}" class="nav-link active">Report Issue</a>
+        <a href="{% url 'track_issue' %}" class="nav-link">Track Issues</a>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <div class="page-header">
+        <div class="page-icon">🏙️</div>
+        <div>
+            <div class="page-title">Report a Community Issue</div>
+            <div class="page-sub">Help us improve your neighbourhood — every report matters</div>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="msg {{ message.tags }}">
+            {% if message.tags == 'success' %}✅{% else %}⚠️{% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="messages">
+        <div class="msg error">
+            ⚠️ Please fix the following errors:
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <br>• {{ field }}: {{ error }}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" id="report-form">
+        {% csrf_token %}
+
+        <!-- Hidden fields -->
+        <input type="hidden" name="issue_type" id="issue_type_input" value="water">
+        <input type="hidden" name="latitude" id="lat-input">
+        <input type="hidden" name="longitude" id="lng-input">
+
+        <!-- ISSUE TYPE -->
+        <div class="form-section">
+            <div class="section-label">Select Issue Type</div>
+            <div class="issue-types">
+                <div class="issue-btn selected" data-value="water" onclick="selectIssue(this)">
+                    <span class="ico">💧</span>
+                    <div class="lbl">Water Leak</div>
+                </div>
+                <div class="issue-btn" data-value="electricity" onclick="selectIssue(this)">
+                    <span class="ico">⚡</span>
+                    <div class="lbl">Electricity Fault</div>
+                </div>
+                <div class="issue-btn" data-value="pothole" onclick="selectIssue(this)">
+                    <span class="ico">🕳️</span>
+                    <div class="lbl">Pothole</div>
+                </div>
+                <div class="issue-btn" data-value="waste" onclick="selectIssue(this)">
+                    <span class="ico">🗑️</span>
+                    <div class="lbl">Waste Collection</div>
+                </div>
+            </div>
+            {% if form.issue_type.errors %}
+                <div class="field-error">{{ form.issue_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- PHOTO -->
+        <div class="form-section">
+            <div class="section-label">Add Photo</div>
+            <div class="upload-zone" id="photo-zone">
+                <input type="file" name="photo" id="photo-input" accept="image/*" onchange="handlePhotoChange(this)">
+                <span class="uz-ico" id="photo-ico">📷</span>
+                <div class="uz-txt" id="photo-txt">Tap to upload a photo</div>
+                <div class="uz-hint">JPG, PNG or HEIC up to 10MB</div>
+                <div class="uz-name" id="photo-name"></div>
+            </div>
+            {% if form.photo.errors %}
+                <div class="field-error">{{ form.photo.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- VOICE NOTE -->
+        <div class="form-section">
+            <div class="section-label">Voice Note</div>
+            <div class="voice-row">
+                <div class="rec-btn" id="rec-btn" onclick="toggleRecording()">🎙️</div>
+                <div class="rec-info">
+                    <div class="wave-bars" id="wave-bars">
+                        <div class="bar"></div><div class="bar"></div>
+                        <div class="bar"></div><div class="bar"></div>
+                        <div class="bar"></div><div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div class="rec-timer" id="rec-timer">00:00</div>
+                    <div class="rec-label" id="rec-label">Tap to record a voice note</div>
+                </div>
+            </div>
+            <!-- Voice blob will be appended here as hidden input on stop -->
+        </div>
+
+        <!-- LOCATION -->
+        <div class="form-section">
+            <div class="section-label">Location</div>
+            <div class="loc-grid">
+                <div class="loc-btn" id="auto-loc-btn" onclick="autoDetectLocation()">
+                    <div class="loc-dot"></div>
+                    Auto-detect Location
+                </div>
+                <div class="loc-btn" onclick="document.getElementById('location-input').focus()">
+                    <div class="loc-dot" style="background:var(--blue)"></div>
+                    Edit Manually
+                </div>
+            </div>
+            <input
+                type="text"
+                name="location"
+                id="location-input"
+                class="loc-input"
+                placeholder="e.g. 123 Main Street, Johannesburg"
+                value="{{ form.location.value|default:'' }}"
+            >
+            {% if form.location.errors %}
+                <div class="field-error">{{ form.location.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="form-section">
+            <div class="section-label">Description</div>
+            <textarea
+                name="description"
+                id="description"
+                class="desc-textarea"
+                rows="4"
+                maxlength="1000"
+                placeholder="Describe the issue in detail — what you see, how long it's been there..."
+                oninput="updateCharCount()"
+            >{{ form.description.value|default:'' }}</textarea>
+            <div class="char-row">
+                <span class="char-count" id="char-count">0 / 1000</span>
+            </div>
+            {% if form.description.errors %}
+                <div class="field-error">{{ form.description.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Submit Report →
+        </button>
+    </form>
+
+</div>
+
+<script>
+// Issue type selection
+function selectIssue(el) {
+    document.querySelectorAll('.issue-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('issue_type_input').value = el.dataset.value;
+}
+
+// Restore selection from form errors
+(function() {
+    const val = document.getElementById('issue_type_input').value;
+    document.querySelectorAll('.issue-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.value === val);
+    });
+})();
+
+// Photo upload
+function handlePhotoChange(input) {
+    const zone = document.getElementById('photo-zone');
+    const ico = document.getElementById('photo-ico');
+    const txt = document.getElementById('photo-txt');
+    const name = document.getElementById('photo-name');
+    if (input.files && input.files[0]) {
+        zone.classList.add('has-file');
+        ico.textContent = '✅';
+        txt.textContent = 'Photo selected';
+        name.textContent = input.files[0].name;
+    }
+}
+
+// Char count
+function updateCharCount() {
+    const ta = document.getElementById('description');
+    const cc = document.getElementById('char-count');
+    const len = ta.value.length;
+    cc.textContent = `${len} / 1000`;
+    cc.classList.toggle('warn', len > 800);
+}
+updateCharCount();
+
+// Auto-detect location
+function autoDetectLocation() {
+    const btn = document.getElementById('auto-loc-btn');
+    const input = document.getElementById('location-input');
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+    }
+    btn.classList.add('detecting');
+    btn.querySelector('.loc-dot').style.background = 'var(--accent)';
+    btn.lastChild.textContent = ' Detecting...';
+
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            document.getElementById('lat-input').value = lat;
+            document.getElementById('lng-input').value = lng;
+
+            // Reverse geocode with Nominatim (free, no key needed)
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+                .then(r => r.json())
+                .then(data => {
+                    const addr = data.display_name || `${lat}, ${lng}`;
+                    input.value = addr;
+                    btn.classList.remove('detecting');
+                    btn.innerHTML = '<div class="loc-dot" style="background:var(--accent)"></div> Location Found ✓';
+                })
+                .catch(() => {
+                    input.value = `${lat}, ${lng}`;
+                    btn.classList.remove('detecting');
+                    btn.innerHTML = '<div class="loc-dot" style="background:var(--accent)"></div> Location Found ✓';
+                });
+        },
+        function() {
+            btn.classList.remove('detecting');
+            btn.innerHTML = '<div class="loc-dot"></div> Detection Failed';
+            alert('Could not detect location. Please enter it manually.');
+        }
+    );
+}
+
+// Voice recording
+let mediaRecorder = null;
+let audioChunks = [];
+let recInterval = null;
+let recSeconds = 0;
+let recording = false;
+
+function toggleRecording() {
+    if (!recording) {
+        startRecording();
+    } else {
+        stopRecording();
+    }
+}
+
+function startRecording() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Voice recording is not supported in this browser.');
+        return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            recording = true;
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = saveVoiceNote;
+            mediaRecorder.start();
+
+            document.getElementById('rec-btn').classList.add('recording');
+            document.getElementById('rec-btn').textContent = '⏹️';
+            document.getElementById('rec-label').style.color = 'var(--danger)';
+            document.getElementById('rec-label').textContent = 'Recording... tap to stop';
+            document.getElementById('rec-timer').style.display = 'block';
+            document.querySelectorAll('.bar').forEach(b => b.classList.add('active'));
+
+            recSeconds = 0;
+            recInterval = setInterval(() => {
+                recSeconds++;
+                const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+                const s = String(recSeconds % 60).padStart(2, '0');
+                document.getElementById('rec-timer').textContent = `${m}:${s}`;
+            }, 1000);
+        })
+        .catch(() => alert('Microphone access denied. Please allow microphone permissions.'));
+}
+
+function stopRecording() {
+    recording = false;
+    clearInterval(recInterval);
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    document.getElementById('rec-btn').classList.remove('recording');
+    document.getElementById('rec-btn').textContent = '✅';
+    document.getElementById('rec-timer').style.display = 'none';
+    document.querySelectorAll('.bar').forEach(b => b.classList.remove('active'));
+    document.getElementById('rec-label').style.color = 'var(--accent)';
+    document.getElementById('rec-label').textContent = `Voice note saved (${recSeconds}s) ✓`;
+}
+
+function saveVoiceNote() {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    const file = new File([blob], 'voice_note.webm', { type: 'audio/webm' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    // Create hidden file input and attach to form
+    let existing = document.getElementById('voice-file-input');
+    if (existing) existing.remove();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.name = 'voice_note';
+    input.id = 'voice-file-input';
+    input.style.display = 'none';
+    input.files = dt.files;
+    document.getElementById('report-form').appendChild(input);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Issues — MySmartCity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0B1221;
+            --surface: #131D30;
+            --card: #1A2640;
+            --card-hover: #1F2E4A;
+            --border: #2A3B55;
+            --border-light: #3A4F6A;
+            --accent: #00C896;
+            --accent-dim: #00C89618;
+            --accent-glow: #00C89633;
+            --blue: #3B82F6;
+            --blue-dim: #3B82F618;
+            --blue-glow: #3B82F633;
+            --text: #E8EDF5;
+            --muted: #7A8BA5;
+            --subtle: #2E4060;
+            --danger: #EF4444;
+            --warn: #F59E0B;
+            --r: 12px;
+            --r-sm: 8px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* ── TOP NAV ── */
+        .topnav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .brand {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--accent);
+            letter-spacing: -.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: brandpulse 2s infinite; }
+        @keyframes brandpulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            transition: .2s;
+            border: 1px solid transparent;
+        }
+        .nav-link:hover { color: var(--text); background: var(--card); }
+        .nav-link.active { color: var(--accent); background: var(--accent-dim); border-color: var(--accent-glow); }
+
+        /* ── PAGE LAYOUT ── */
+        .page-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 36px 24px;
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .page-icon {
+            width: 50px; height: 50px;
+            border-radius: 13px;
+            background: var(--blue-dim);
+            border: 1px solid var(--blue-glow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.1;
+        }
+        .page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 16px 14px;
+            text-align: center;
+            transition: border-color .2s;
+        }
+        .stat-card:hover { border-color: var(--border-light); }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+        }
+        .c-all { color: var(--text); }
+        .c-submitted { color: #60A5FA; }
+        .c-inprogress { color: #FCD34D; }
+        .c-completed { color: #34D399; }
+
+        /* ── SEARCH + FILTERS ── */
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-wrap {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-ico {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 10px 14px 10px 38px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: .2s;
+        }
+        .search-input:focus { border-color: var(--border-light); }
+        .search-input::placeholder { color: var(--muted); }
+        .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+        .pill {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--muted);
+            text-decoration: none;
+            transition: .2s;
+            white-space: nowrap;
+        }
+        .pill:hover { border-color: var(--border-light); color: var(--text); }
+        .pill.all.active  { background: var(--subtle); border-color: var(--border-light); color: var(--text); }
+        .pill.sub.active  { background: var(--blue-dim); border-color: var(--blue-glow); color: #60A5FA; }
+        .pill.prog.active { background: #F59E0B18; border-color: #F59E0B33; color: #FCD34D; }
+        .pill.comp.active { background: #10B98118; border-color: #10B98133; color: #34D399; }
+
+        /* ── ISSUE CARDS ── */
+        .issues-list { display: flex; flex-direction: column; gap: 10px; }
+        .issue-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 16px 18px;
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 14px;
+            align-items: center;
+            transition: all .2s;
+            cursor: default;
+        }
+        .issue-card:hover {
+            border-color: var(--border-light);
+            transform: translateX(4px);
+            background: var(--card-hover);
+        }
+        .card-ico {
+            width: 44px; height: 44px;
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .ico-water     { background: var(--blue-dim); border: 1px solid var(--blue-glow); }
+        .ico-pothole   { background: #F59E0B18; border: 1px solid #F59E0B33; }
+        .ico-electricity { background: #EF444418; border: 1px solid #EF444433; }
+        .ico-waste     { background: #10B98118; border: 1px solid #10B98133; }
+
+        .card-body { min-width: 0; }
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-location {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-date { font-size: 11px; color: var(--border-light); margin-top: 3px; }
+        .card-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+        }
+
+        /* ── STATUS BADGES ── */
+        .badge {
+            padding: 5px 13px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            font-family: 'Syne', sans-serif;
+            letter-spacing: .04em;
+            flex-shrink: 0;
+        }
+        .badge-submitted  { background: var(--blue-dim); color: #60A5FA; border: 1px solid var(--blue-glow); }
+        .badge-in_progress{ background: #F59E0B18; color: #FCD34D; border: 1px solid #F59E0B33; }
+        .badge-completed  { background: #10B98118; color: #34D399; border: 1px solid #10B98133; }
+        .badge-rejected   { background: #EF444418; color: #F87171; border: 1px solid #EF444433; }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+        }
+        .empty-ico { font-size: 48px; display: block; margin-bottom: 16px; }
+        .empty-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .empty-sub { font-size: 14px; color: var(--muted); }
+        .empty-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 22px;
+            background: var(--accent);
+            color: #0B1221;
+            border-radius: var(--r-sm);
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .2s;
+        }
+        .empty-link:hover { filter: brightness(1.1); }
+
+        /* ── ISSUE TYPE ICONS MAP ── */
+        .result-count {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .result-count strong { color: var(--text); }
+
+        @media (max-width: 540px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .issue-card { grid-template-columns: 40px 1fr; }
+            .badge { display: none; }
+            .topnav { padding: 0 16px; }
+            .page-wrap { padding: 24px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <div class="brand">
+        <div class="brand-dot"></div>
+        MySmartCity
+    </div>
+    <div class="nav-links">
+        <a href="{% url 'report_issue' %}" class="nav-link">Report Issue</a>
+        <a href="{% url 'track_issue' %}" class="nav-link active">Track Issues</a>
+    </div>
+</nav>
+
+<div class="page-wrap">
+
+    <div class="page-header">
+        <div class="header-left">
+            <div class="page-icon"></div>
+            <div>
+                <div class="page-title">Track Reported Issues</div>
+                <div class="page-sub">Monitor the status of your community reports</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-num c-all">{{ total }}</div>
+            <div class="stat-lbl">Total Reported</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num c-submitted">{{ submitted_count }}</div>
+            <div class="stat-lbl">Submitted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num c-inprogress">{{ in_progress_count }}</div>
+            <div class="stat-lbl">In Progress</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num c-completed">{{ completed_count }}</div>
+            <div class="stat-lbl">Completed</div>
+        </div>
+    </div>
+
+    <!-- SEARCH + FILTERS -->
+    <form method="GET" action="{% url 'track_issue' %}">
+        <div class="controls-row">
+            <div class="search-wrap">
+                <span class="search-ico"></span>
+                <input
+                    type="text"
+                    name="search"
+                    class="search-input"
+                    placeholder="Search by description or location..."
+                    value="{{ search_query }}"
+                >
+            </div>
+            <div class="filter-pills">
+                <a href="?status=all{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pill all {% if status_filter == 'all' %}active{% endif %}">All</a>
+                <a href="?status=submitted{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pill sub {% if status_filter == 'submitted' %}active{% endif %}">Submitted</a>
+                <a href="?status=in_progress{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pill prog {% if status_filter == 'in_progress' %}active{% endif %}">In Progress</a>
+                <a href="?status=completed{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pill comp {% if status_filter == 'completed' %}active{% endif %}">Completed</a>
+                <button type="submit" style="display:none"></button>
+            </div>
+        </div>
+    </form>
+
+    {% if issues %}
+        <div class="result-count">
+            Showing <strong>{{ issues|length }}</strong> issue{{ issues|length|pluralize }}
+            {% if search_query %} matching "<strong>{{ search_query }}</strong>"{% endif %}
+            {% if status_filter != 'all' %} with status "<strong>{{ status_filter|title }}</strong>"{% endif %}
+        </div>
+        <div class="issues-list">
+            {% for issue in issues %}
+            <div class="issue-card">
+                <div class="card-ico
+                    {% if issue.issue_type == 'water' %}ico-water
+                    {% elif issue.issue_type == 'pothole' %}ico-pothole
+                    {% elif issue.issue_type == 'electricity' %}ico-electricity
+                    {% else %}ico-waste{% endif %}">
+                    {% if issue.issue_type == 'water' %}💧
+                    {% elif issue.issue_type == 'electricity' %}⚡
+                    {% elif issue.issue_type == 'pothole' %}🕳️
+                    {% else %}🗑️{% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="card-title">{{ issue.get_issue_type_display }}</div>
+                    <div class="card-location">
+                         {% if issue.location %}{{ issue.location }}{% else %}Location not specified{% endif %}
+                    </div>
+                    {% if issue.description %}
+                    <div class="card-desc">{{ issue.description|truncatechars:80 }}</div>
+                    {% endif %}
+                    <div class="card-date">Reported {{ issue.submitted_at|timesince }} ago</div>
+                </div>
+                <span class="badge badge-{{ issue.status }}">
+                    {% if issue.status == 'submitted' %}Submitted
+                    {% elif issue.status == 'in_progress' %}In Progress
+                    {% elif issue.status == 'completed' %}Completed
+                    {% else %}Rejected{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <span class="empty-ico">🏙️</span>
+            <div class="empty-title">No issues found</div>
+            <div class="empty-sub">
+                {% if search_query or status_filter != 'all' %}
+                    No issues match your current filters. Try adjusting your search.
+                {% else %}
+                    No issues have been reported yet. Be the first to help your community!
+                {% endif %}
+            </div>
+            <a href="{% url 'report_issue' %}" class="empty-link">Report an Issue →</a>
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
